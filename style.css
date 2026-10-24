@@ -1,0 +1,811 @@
+/* ===== Reset & Base ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1f2937;
+  background: #e5e7eb;
+  overflow: hidden;
+  height: 100%;
+}
+button { border: none; background: none; font: inherit; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+input { font: inherit; outline: none; border: none; background: transparent; }
+img { max-width: 100%; }
+
+/* ===== 手机外壳模拟 ===== */
+.phone-frame {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  height: 100vh;
+  height: 100dvh; /* 手机浏览器地址栏会占位，用动态视口高度保证底部工具栏不被挤出屏幕 */
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== 页面通用 ===== */
+.page {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  background: #f8fafc;
+}
+.page.active { display: flex; animation: pageIn .25s ease-out; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== App 头部 ===== */
+.app-header {
+  padding: 4px 16px 12px;
+  flex-shrink: 0;
+  background: transparent;
+  position: relative;
+  z-index: 4;
+}
+.app-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 4px 0 12px;
+}
+.app-title-center {
+  margin: 4px 0 0;
+  font-size: 17px;
+  text-align: center;
+  font-weight: 600;
+  flex: 1;
+}
+.app-header-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 12px;
+  background: #fff;
+  /* 顶部留出安全距离，避免真机上返回箭头被系统状态栏/刘海遮挡 */
+  padding-top: max(14px, env(safe-area-inset-top, 0px));
+}
+.back-btn {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.08);
+}
+.back-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.search-box {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  transition: border-color .2s;
+  background-color: #f3f4f6;
+}
+.search-box:focus-within { border-color: #cbd5e1; }
+.search-box .search-icon { flex-shrink: 0; }
+.search-box input {
+  flex: 1;
+  font-size: 14px;
+  color: #1f2937;
+}
+.search-box input::placeholder { color: #9ca3af; }
+.search-clear {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #9ca3af; color: #fff;
+  font-size: 13px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== 滚动区 ===== */
+.scrollable {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+}
+.scrollable::-webkit-scrollbar { width: 0; }
+.bottom-spacer { height: 80px; }
+
+/* ===== 顶部分类Banner ===== */
+.book-banner {
+  display: flex;
+  gap: 0;
+  height: 96px;
+  margin: 0 0 12px;
+  background: #f3f4f6;
+  position: relative;
+  overflow: hidden;
+}
+.banner-item {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.banner-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.55) 100%);
+  z-index: 1;
+}
+.banner-jinkui {
+  background:
+    linear-gradient(180deg, transparent, rgba(0,0,0,.55)),
+    linear-gradient(135deg, #7a6450, #5e4a3e);
+}
+.banner-shennong {
+  background:
+    linear-gradient(180deg, transparent, rgba(0,0,0,.55)),
+    linear-gradient(135deg, #4a7a5a, #2e5c3e);
+  flex: 1.4;
+}
+.banner-zhenjiu {
+  background:
+    linear-gradient(180deg, transparent, rgba(0,0,0,.55)),
+    linear-gradient(135deg, #5a6a5a, #3a4f3e);
+}
+.banner-text {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 6px rgba(0,0,0,.7);
+}
+
+/* ===== 提示条 ===== */
+.hint-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  color: #4b5563;
+  font-size: 13px;
+  background: #fff;
+  margin: 0 0 4px;
+}
+.hint-icon { font-size: 16px; }
+
+/* ===== 教材section ===== */
+.empty-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 32px;
+  text-align: center;
+}
+.empty-board-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+.empty-board-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+.empty-board-desc {
+  font-size: 14px;
+  color: #9ca3af;
+}
+.book-section {
+  background: #fff;
+  margin-bottom: 12px;
+  padding: 16px 0 4px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 12px;
+}
+.section-bar {
+  width: 3px;
+  height: 16px;
+  background: #3b82f6;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+.section-title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f2937;
+}
+.section-link {
+  color: #9ca3af;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+.chapter-btn {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 14px 6px;
+  text-align: center;
+  font-size: 14px;
+  color: #1f2937;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  line-height: 1.3;
+}
+.chapter-btn:active {
+  background: #e5e7eb;
+  transform: scale(.96);
+}
+.chapter-btn.disabled {
+  background: #f9fafb;
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+.chapter-btn-more {
+  background: #eff6ff;
+  color: #3b82f6;
+  border: 1px dashed #93c5fd;
+  font-size: 13px;
+}
+
+/* ===== 搜索结果 ===== */
+.search-results {
+  background: #fff;
+  margin-top: 12px;
+}
+.search-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 8px;
+  font-weight: 700;
+  font-size: 15px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.search-count {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+.search-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+.search-item:active { background: #f8fafc; }
+.search-item-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+.search-item-bread {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.search-item-snippet {
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== 搜索分组（按书） ===== */
+.search-group {
+  border-bottom: 1px solid #f1f5f9;
+}
+.search-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 16px;
+  background: #f8fafc;
+  cursor: pointer;
+  border-bottom: 1px solid #eef2f7;
+}
+.search-group-head:active { background: #f1f5f9; }
+.search-group-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-group-arrow {
+  font-size: 13px;
+  color: #6b7280;
+  width: 14px;
+  transition: transform .2s;
+}
+.search-group-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+.search-group-count {
+  font-size: 12px;
+  color: #3b82f6;
+  background: rgba(59,130,246,.1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.search-group-body {
+  display: none;
+}
+.search-group-body.open {
+  display: block;
+}
+.search-item-snippet mark {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0 2px;
+}
+
+/* ===== Tab Bar ===== */
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  color: #9ca3af;
+  font-size: 10px;
+  cursor: pointer;
+  min-width: 0;
+}
+.tab span {
+  white-space: nowrap;
+}
+.tab svg { color: currentColor; }
+.tab.tab-active { color: #3b82f6; }
+
+/* ===== 章节列表页（图2） ===== */
+.page-jie { background: #f8fafc; }
+.top-tabs {
+  display: flex;
+  overflow-x: auto;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.top-tabs::-webkit-scrollbar { display: none; }
+.top-tab {
+  padding: 14px 14px 12px;
+  font-size: 15px;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+  position: relative;
+  flex-shrink: 0;
+}
+.top-tab.active {
+  color: #1f2937;
+  font-weight: 700;
+}
+.top-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #3b82f6;
+  border-radius: 2px;
+}
+
+.jie-list {
+  background: #fff;
+}
+.jie-card {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 16px 16px;
+  cursor: pointer;
+  position: relative;
+}
+.jie-card:active { background: #f8fafc; }
+.jie-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.jie-card-pian {
+  font-size: 12px;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.jie-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+  flex: 1;
+}
+.jie-card-snippet {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.jie-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.jie-card-tag {
+  background: #3b82f6;
+  color: #fff;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+.jie-card-pos {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ===== 内容详情页（图3） ===== */
+.page-content { background: #fff; }
+.page-content .app-header { background: #fff; }
+#content-scroll {
+  background: #fff;
+  padding: 8px 0;
+}
+.article {
+  padding: 14px 18px;
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: -0.2px;
+  color: #1f2937;
+}
+.article-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.article-breadcrumb {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.article-breadcrumb .crumb {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #fef3c7;
+  color: #92400e;
+}
+.article-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: -0.2px;
+}
+.article-content p {
+  margin-bottom: 14px;
+  text-indent: 2em;
+}
+.article-content.gua-note {
+  font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif;
+  font-size: 0.88em;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+  color: #4a4842;
+}
+.article-content.gua-note p {
+  text-indent: 0;
+  margin-bottom: 8px;
+}
+.gua-note-title {
+  font-weight: 700;
+}
+.yao-name {
+  font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif;
+  font-weight: 700;
+}
+.tianji-src {
+  font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif;
+  font-weight: 700;
+  font-size: 1.06em;
+  line-height: 1.75;
+  text-indent: 0;
+  margin: 16px 0 6px;
+  color: #3f3428;
+  white-space: normal;
+}
+.tianji-note {
+  margin: 0 0 12px;
+  text-indent: 2em;
+  line-height: 1.75;
+  white-space: normal;
+}
+.article-image {
+  display: block;
+  max-width: 100%;
+  margin: 14px auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.article-page-indicator {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+  margin: 24px 0 8px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+}
+
+/* ===== 底部工具栏 ===== */
+.content-toolbar {
+  display: flex;
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+.tool {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: #4b5563;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.tool:active { color: #3b82f6; }
+.tool.disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tool svg { color: currentColor; }
+/* 高亮开关：开启（实心五角星）时按钮着色，关闭时灰色空心 */
+#btn-hl svg { transition: color .15s ease; }
+#btn-hl:not(.hl-active) { color: #9ca3af; }
+#btn-hl.hl-active { color: #f59e0b; }
+#btn-hl.hl-active svg { color: #f59e0b; }
+/* 关闭高亮时隐藏正文里的标黄，但保留文字内容与排版 */
+.article.hl-hidden .search-hl {
+  background: transparent;
+  color: inherit;
+  font-weight: inherit;
+  padding: 0;
+}
+
+/* ===== 方剂灰色框 ===== */
+.formula-box {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 12px 0;
+}
+.formula-box h4 {
+  text-align: center;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #d1d5db;
+}
+.formula-box p {
+  margin: 4px 0;
+  line-height: 1.7;
+  color: #374151;
+}
+.formula-box p + p {
+  margin-top: 6px;
+}
+
+/* ===== 全局搜索页 ===== */
+.search-box-expand {
+  flex: 1;
+  min-width: 0;
+}
+.global-search-hint {
+  padding: 80px 30px;
+  text-align: center;
+  color: #9ca3af;
+}
+.global-search-hint-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+.global-search-hint p {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.global-search-hint-sub {
+  font-size: 13px;
+  color: #b6bcc4;
+}
+
+/* ===== 响应式 ===== */
+@media (min-width: 500px) {
+  body { padding: 12px 0; }
+  .phone-frame {
+    border-radius: 28px;
+    height: calc(100vh - 24px);
+    box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    border: 6px solid #1f2937;
+  }
+}
+
+/* 内容页搜索关键词标黄 */
+.search-hl {
+  background: #fff3a3;
+  color: #7a4b00;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* ===== 医案板块：一行一条 ===== */
+.article-content.yian-content {
+  padding-top: 4px;
+}
+.yian-line {
+  margin: 0 0 10px 0;
+  line-height: 1.75;
+  padding-left: 0;
+}
+.yian-label {
+  display: inline-block;
+  min-width: 5.2em;
+  color: #a8552b;
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+/* ===== 条文块（倪注金匮）===== */
+.verse-box {
+  background: #fffaf0;
+  border-left: 4px solid #d9a441;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 14px;
+  margin: 4px 0 16px 0;
+  font-weight: 600;
+  color: #7a4b12;
+  line-height: 1.85;
+  font-size: 1.02em;
+}
+
+/* ===== 方剂框：网格式组成（倪注金匮）===== */
+.formula-head {
+  text-align: center;
+  font-size: 1.08em;
+  font-weight: 700;
+  color: #8a4b1e;
+  padding-bottom: 9px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #d1d5db;
+  letter-spacing: .5px;
+}
+.formula-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46%, 1fr));
+  gap: 4px 12px;
+}
+.fx-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.7;
+  font-size: .96em;
+}
+.fx-herb {
+  flex: 0 0 4.2em;
+  color: #1f2937;
+  font-weight: 600;
+}
+.fx-dose {
+  color: #5b6470;
+  font-size: .92em;
+}
+.fx-decoct {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed #d1d5db;
+  color: #4b5563;
+  font-size: .94em;
+  line-height: 1.75;
+}
+
+/* ===== 承淡安《伤寒论新注》：正文照常分段，药方与针法用楷体小字 ===== */
+.cd-p {
+  margin: 0 0 14px;
+  text-indent: 2em;
+  white-space: normal;
+  line-height: 1.7;
+}
+.cd-kai {
+  margin: 4px 0 14px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "KaiTi_GB2312", serif;
+  font-size: 0.86em;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+  color: #4a4842;
+  text-indent: 0;
+  white-space: normal;
+  word-break: break-word;
+}
+.cd-kai .kai-name {
+  font-weight: 700;
+  color: #8a5a2b;
+  letter-spacing: 0.04em;
+}
