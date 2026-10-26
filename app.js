@@ -236,6 +236,7 @@
 
     // 无论当前在哪个页面，切换板块都回到板块列表页（home）
     $('#home-search').value = '';
+    $('#home-search').placeholder = key === 'tianji' ? '搜索卦名，如乾为天、水风井' : '查询当前板块中的内容';
     state.searchKeyword = '';
     updateClearBtn();
     $('#search-results').style.display = 'none';
@@ -245,11 +246,39 @@
   }
 
   // ===== 板块列表页渲染 =====
-  function renderHome() {
+  function normName(s) {
+    return String(s || '').toLowerCase().replace(/[爲為]/g, '为').replace(/\s+/g, '');
+  }
+
+  function markedTitle(title, keyword) {
+    const shown = shortChapterTitle(title);
+    const kw = String(keyword || '').trim();
+    const i = shown.toLowerCase().indexOf(kw.toLowerCase());
+    if (!kw || i < 0) return escapeHtml(shown);
+    return escapeHtml(shown.slice(0, i)) + '<mark>' + escapeHtml(shown.slice(i, i + kw.length)) + '</mark>' + escapeHtml(shown.slice(i + kw.length));
+  }
+
+  function titleHitsFor(keyword) {
+    const nk = normName(keyword);
+    if (!nk) return [];
+    const hits = [];
+    getCurrentTab().books.forEach(meta => {
+      const book = getBook(meta.id);
+      if (!book) return;
+      book.chapters.forEach((ch, idx) => {
+        if (normName(ch.title).includes(nk)) hits.push({ book, ch, idx });
+      });
+    });
+    return hits;
+  }
+
+  function renderHome(keyword) {
     const tab = getCurrentTab();
     $('#board-title').textContent = tab.label;
     const container = $('#book-sections-container');
     container.innerHTML = '';
+    const kw = String(keyword || '').trim();
+    const nk = normName(kw);
 
     // 医案空板块
     if (tab.empty) {
@@ -280,15 +309,19 @@
       section.appendChild(header);
 
       if (hasData) {
-        // 默认展示前若干个章节按钮
+        // 默认展示前若干个章节按钮；有搜索词时只留标题命中的章节
         const grid = document.createElement('div');
         grid.className = 'chapter-grid';
-        const showCount = Math.min(9, realBook.chapters.length);
+        const matched = nk
+          ? realBook.chapters.map((ch, idx) => ({ ch, idx })).filter(x => normName(x.ch.title).includes(nk))
+          : null;
+        if (matched && matched.length === 0) return;
+        const showCount = matched ? matched.length : Math.min(9, realBook.chapters.length);
         // 带章节索引，用于点击后定位到对应章节
-        function makeBtn(ch, idx) {
+        function makeBtn(ch, idx, hit) {
           const btn = document.createElement('div');
-          btn.className = 'chapter-btn';
-          btn.textContent = shortChapterTitle(ch.title);
+          btn.className = 'chapter-btn' + (hit ? ' chapter-btn-hit' : '');
+          btn.innerHTML = hit ? markedTitle(ch.title, kw) : escapeHtml(shortChapterTitle(ch.title));
           btn.title = ch.title;
           btn.addEventListener('click', () => {
             state.currentBookId = realBook.id;
@@ -298,11 +331,18 @@
           });
           return btn;
         }
-        for (let i = 0; i < showCount; i++) {
-          grid.appendChild(makeBtn(realBook.chapters[i], i));
+        if (matched) {
+          const hint = document.createElement('div');
+          hint.className = 'title-hit-hint';
+          hint.textContent = '找到 ' + matched.length + ' 个标题，点进去就是这一章';
+          section.appendChild(hint);
+          matched.forEach(x => grid.appendChild(makeBtn(x.ch, x.idx, true)));
+        }
+        for (let i = 0; matched ? i < 0 : i < showCount; i++) {
+          grid.appendChild(makeBtn(realBook.chapters[i], i, false));
         }
         // 如果章节多，加"更多"按钮 -> 就地展开全部章节
-        if (realBook.chapters.length > showCount) {
+        if (!matched && realBook.chapters.length > showCount) {
           const more = document.createElement('div');
           more.className = 'chapter-btn chapter-btn-more';
           more.textContent = `查看全部 ${realBook.chapters.length} 章 ›`;
@@ -312,7 +352,11 @@
         section.appendChild(grid);
 
         const link = header.querySelector('.section-link');
-        link.addEventListener('click', () => toggleExpand(section, realBook, grid, makeBtn, grid.querySelector('.chapter-btn-more')));
+        if (matched) {
+          if (link) link.remove();
+        } else if (link) {
+          link.addEventListener('click', () => toggleExpand(section, realBook, grid, makeBtn, grid.querySelector('.chapter-btn-more')));
+        }
       } else {
         // 无数据教材
         const grid = document.createElement('div');
@@ -664,9 +708,20 @@
     if (!val) {
       $('#search-results').style.display = 'none';
       $('#book-sections-container').style.display = '';
+      renderHome();
       return;
     }
-    searchDebounce = setTimeout(() => runSearch(val), 180);
+    searchDebounce = setTimeout(() => {
+      if (titleHitsFor(val).length) {
+        $('#search-results').style.display = 'none';
+        $('#book-sections-container').style.display = '';
+        renderHome(val);
+        const first = document.querySelector('.chapter-btn-hit');
+        if (first) first.scrollIntoView({ block: 'center' });
+      } else {
+        runSearch(val);
+      }
+    }, 180);
   }
 
   // 全局搜索输入
@@ -888,6 +943,17 @@
   }
 
   // ===== 启动 =====
+  function fitScreen() {
+    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--app-h', Math.round(h) + 'px');
+  }
+  fitScreen();
+  window.addEventListener('resize', fitScreen);
+  window.addEventListener('orientationchange', fitScreen);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fitScreen);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     // 建立历史锚点
     try { history.replaceState({ page: 'home' }, ''); } catch (e) {}
@@ -902,6 +968,9 @@
     // 指定初始板块
     if (urlTab && TABS.some(t => t.key === urlTab)) {
       state.currentTab = urlTab;
+    }
+    if (state.currentTab === 'tianji') {
+      $('#home-search').placeholder = '搜索卦名，如乾为天、水风井';
     }
 
     renderHome();

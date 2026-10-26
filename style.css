@@ -59,6 +59,10 @@ img { max-width: 100%; }
   position: relative;
   z-index: 4;
 }
+/* 添加到主屏幕后，状态栏盖住标题，首页顶上留出安全区 */
+.page-home > .app-header {
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+}
 .app-title {
   font-size: 22px;
   font-weight: 700;
@@ -288,6 +292,25 @@ img { max-width: 100%; }
   color: #3b82f6;
   border: 1px dashed #93c5fd;
   font-size: 13px;
+}
+.chapter-btn-hit {
+  background: #fff4d6;
+  color: #9a3412;
+  border: 1.5px solid #f59e0b;
+  font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.28);
+}
+.chapter-btn-hit mark {
+  background: #f59e0b;
+  color: #fff;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.title-hit-hint {
+  padding: 2px 16px 10px;
+  font-size: 13px;
+  color: #b45309;
+  font-weight: 600;
 }
 
 /* ===== 搜索结果 ===== */
@@ -692,10 +715,26 @@ img { max-width: 100%; }
   color: #b6bcc4;
 }
 
+/* 手机全屏（尤其是添加到主屏幕）：贴住可视区域，避免底部空出一条 */
+@media (max-width: 499px) {
+  html, body { background: #fff; }
+  .phone-frame {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    height: var(--app-h, 100dvh);
+  }
+}
+
 /* ===== 响应式 ===== */
 @media (min-width: 500px) {
   body { padding: 12px 0; }
   .phone-frame {
+    position: relative;
     border-radius: 28px;
     height: calc(100vh - 24px);
     box-shadow: 0 20px 60px rgba(0,0,0,.15);
