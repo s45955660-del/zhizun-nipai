@@ -753,7 +753,7 @@ img { max-width: 100%; }
     position: fixed;
     left: 0;
     right: 0;
-    bottom: -52px;
+    bottom: -40px;
     z-index: 40;
   }
 }
@@ -762,7 +762,7 @@ html.ios-standalone .page-content .content-toolbar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: -52px;
+  bottom: -40px;
   z-index: 40;
 }
 
