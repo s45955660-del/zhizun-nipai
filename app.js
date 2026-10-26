@@ -935,6 +935,9 @@
       vv ? vv.height + (vv.offsetTop || 0) : 0
     );
     document.documentElement.style.setProperty('--app-h', Math.round(h) + 'px');
+    const standalone = window.navigator.standalone === true
+      || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    document.documentElement.classList.toggle('ios-standalone', !!standalone);
   }
   fitScreen();
   window.addEventListener('resize', fitScreen);

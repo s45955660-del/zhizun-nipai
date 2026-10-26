@@ -745,6 +745,27 @@ img { max-width: 100%; }
   }
 }
 
+/* 添加到主屏幕后，透明状态栏让页面高度少算一截，底栏停在黑线上方。
+   再下移大约半个空隙。普通 Safari 里不挪。 */
+@media (display-mode: standalone) {
+  .page-home .tab-bar,
+  .page-content .content-toolbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: -52px;
+    z-index: 40;
+  }
+}
+html.ios-standalone .page-home .tab-bar,
+html.ios-standalone .page-content .content-toolbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -52px;
+  z-index: 40;
+}
+
 /* ===== 响应式 ===== */
 @media (min-width: 500px) {
   body { padding: 12px 0; }
