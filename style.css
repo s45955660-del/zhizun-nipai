@@ -306,6 +306,9 @@ img { max-width: 100%; }
   border-radius: 3px;
   padding: 0 2px;
 }
+.chapter-btn-dim {
+  opacity: 0.38;
+}
 .title-hit-hint {
   padding: 2px 16px 10px;
   font-size: 13px;
@@ -715,18 +718,30 @@ img { max-width: 100%; }
   color: #b6bcc4;
 }
 
-/* 手机全屏（尤其是添加到主屏幕）：贴住可视区域，避免底部空出一条 */
+/* 手机全屏（尤其是添加到主屏幕）：底栏贴住屏幕底边，不再悬空 */
 @media (max-width: 499px) {
-  html, body { background: #fff; }
+  html, body {
+    background: #fff;
+    height: 100%;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+  }
   .phone-frame {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    inset: 0;
     width: 100%;
     max-width: none;
     margin: 0;
-    height: var(--app-h, 100dvh);
+    height: auto;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+  }
+  .page-home .tab-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
   }
 }
 

@@ -55,11 +55,9 @@
     ]},
     { key: 'nizhu', label: '倪注版教材', icon: 'book', books: [
         { id: 'nizhu', name: '倪注伤寒论教材', display: '倪注伤寒论' },
+        { id: 'chengdan_shanghan', name: '承注伤寒论', display: '承注伤寒论' },
         { id: 'nizhu_shennong', name: '倪注神农本草经教材', display: '倪注神农本草经' },
         { id: 'nizhu_jinkui', name: '倪海厦注解《金匮要略》教材', display: '倪海厦注解《金匮要略》' },
-    ]},
-    { key: 'chengdan', label: '承注伤寒论', icon: 'book', books: [
-        { id: 'chengdan_shanghan', name: '承淡安伤寒论新注', display: '承淡安伤寒论新注' },
     ]},
     { key: 'tianji', label: '天纪', icon: 'taiji', books: [
         { id: 'nizhu_tianji', name: '倪海厦天纪·人间道教材', display: '倪海厦天纪·人间道' },
@@ -299,28 +297,24 @@
       const section = document.createElement('div');
       section.className = 'book-section';
 
+      const showAll = tab.key === 'tianji' || !!nk;
       const header = document.createElement('div');
       header.className = 'section-header';
       header.innerHTML = `
         <span class="section-bar"></span>
         <span class="section-title">${book.name}</span>
-        ${hasData ? '<a class="section-link">查看列表 ›</a>' : ''}
+        ${hasData && !showAll && realBook.chapters.length > 9 ? '<a class="section-link">查看列表 ›</a>' : ''}
       `;
       section.appendChild(header);
 
       if (hasData) {
-        // 默认展示前若干个章节按钮；有搜索词时只留标题命中的章节
         const grid = document.createElement('div');
         grid.className = 'chapter-grid';
-        const matched = nk
-          ? realBook.chapters.map((ch, idx) => ({ ch, idx })).filter(x => normName(x.ch.title).includes(nk))
-          : null;
-        if (matched && matched.length === 0) return;
-        const showCount = matched ? matched.length : Math.min(9, realBook.chapters.length);
-        // 带章节索引，用于点击后定位到对应章节
-        function makeBtn(ch, idx, hit) {
+        const flags = realBook.chapters.map(ch => nk && normName(ch.title).includes(nk));
+        if (nk && !flags.some(Boolean)) return;
+        function makeBtn(ch, idx, hit, dim) {
           const btn = document.createElement('div');
-          btn.className = 'chapter-btn' + (hit ? ' chapter-btn-hit' : '');
+          btn.className = 'chapter-btn' + (hit ? ' chapter-btn-hit' : '') + (dim ? ' chapter-btn-dim' : '');
           btn.innerHTML = hit ? markedTitle(ch.title, kw) : escapeHtml(shortChapterTitle(ch.title));
           btn.title = ch.title;
           btn.addEventListener('click', () => {
@@ -331,18 +325,11 @@
           });
           return btn;
         }
-        if (matched) {
-          const hint = document.createElement('div');
-          hint.className = 'title-hit-hint';
-          hint.textContent = '找到 ' + matched.length + ' 个标题，点进去就是这一章';
-          section.appendChild(hint);
-          matched.forEach(x => grid.appendChild(makeBtn(x.ch, x.idx, true)));
+        const showCount = showAll ? realBook.chapters.length : Math.min(9, realBook.chapters.length);
+        for (let i = 0; i < showCount; i++) {
+          grid.appendChild(makeBtn(realBook.chapters[i], i, flags[i], nk && !flags[i]));
         }
-        for (let i = 0; matched ? i < 0 : i < showCount; i++) {
-          grid.appendChild(makeBtn(realBook.chapters[i], i, false));
-        }
-        // 如果章节多，加"更多"按钮 -> 就地展开全部章节
-        if (!matched && realBook.chapters.length > showCount) {
+        if (!showAll && realBook.chapters.length > showCount) {
           const more = document.createElement('div');
           more.className = 'chapter-btn chapter-btn-more';
           more.textContent = `查看全部 ${realBook.chapters.length} 章 ›`;
@@ -352,9 +339,7 @@
         section.appendChild(grid);
 
         const link = header.querySelector('.section-link');
-        if (matched) {
-          if (link) link.remove();
-        } else if (link) {
+        if (link) {
           link.addEventListener('click', () => toggleExpand(section, realBook, grid, makeBtn, grid.querySelector('.chapter-btn-more')));
         }
       } else {
@@ -944,7 +929,11 @@
 
   // ===== 启动 =====
   function fitScreen() {
-    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const vv = window.visualViewport;
+    const h = Math.max(
+      window.innerHeight || 0,
+      vv ? vv.height + (vv.offsetTop || 0) : 0
+    );
     document.documentElement.style.setProperty('--app-h', Math.round(h) + 'px');
   }
   fitScreen();
@@ -966,7 +955,9 @@
     const urlBook = new URLSearchParams(location.search).get('book');
 
     // 指定初始板块
-    if (urlTab && TABS.some(t => t.key === urlTab)) {
+    if (urlTab === 'chengdan') {
+      state.currentTab = 'nizhu';
+    } else if (urlTab && TABS.some(t => t.key === urlTab)) {
       state.currentTab = urlTab;
     }
     if (state.currentTab === 'tianji') {
