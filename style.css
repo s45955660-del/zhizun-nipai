@@ -26,6 +26,8 @@ img { max-width: 100%; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  container-type: inline-size;
+  container-name: app;
 }
 
 .app-container {
@@ -718,8 +720,8 @@ img { max-width: 100%; }
   color: #b6bcc4;
 }
 
-/* 手机全屏（尤其是添加到主屏幕）：底栏贴住屏幕底边，不再悬空 */
-@media (max-width: 499px) {
+/* 手机和 iPad：按屏幕的宽和高铺满，不再缩在中间的手机框里 */
+@media (max-width: 1399px) {
   html, body {
     background: #fff;
     height: 100%;
@@ -735,6 +737,9 @@ img { max-width: 100%; }
     height: auto;
     min-height: 100%;
     min-height: -webkit-fill-available;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
   .page-home .tab-bar {
     position: fixed;
@@ -745,9 +750,9 @@ img { max-width: 100%; }
   }
 }
 
-/* 添加到主屏幕后，透明状态栏让页面高度少算一截，底栏停在黑线上方。
-   再下移大约半个空隙。普通 Safari 里不挪。 */
-@media (display-mode: standalone) {
+/* 添加到主屏幕后，iPhone 的页面高度少算一截，底栏再往下一点。
+   只作用于窄屏，iPad 贴着屏幕底边即可。 */
+@media (display-mode: standalone) and (max-width: 499px) {
   .page-home .tab-bar,
   .page-content .content-toolbar {
     position: fixed;
@@ -757,17 +762,19 @@ img { max-width: 100%; }
     z-index: 40;
   }
 }
-html.ios-standalone .page-home .tab-bar,
-html.ios-standalone .page-content .content-toolbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: -40px;
-  z-index: 40;
+@media (max-width: 499px) {
+  html.ios-standalone .page-home .tab-bar,
+  html.ios-standalone .page-content .content-toolbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: -40px;
+    z-index: 40;
+  }
 }
 
-/* ===== 响应式 ===== */
-@media (min-width: 500px) {
+/* 大桌面才保留手机外壳。iPad 横竖屏都走上面的全屏。 */
+@media (min-width: 1400px) {
   body { padding: 12px 0; }
   .phone-frame {
     position: relative;
@@ -776,6 +783,38 @@ html.ios-standalone .page-content .content-toolbar {
     box-shadow: 0 20px 60px rgba(0,0,0,.15);
     border: 6px solid #1f2937;
   }
+}
+
+/* 外壳变宽时，格子和正文字号跟着变，避免 iPad 上按钮被拉成一整条 */
+@container app (min-width: 680px) {
+  .chapter-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .chapter-btn {
+    font-size: 16px;
+    min-height: 52px;
+    padding: 16px 10px;
+  }
+  .app-title { font-size: 28px; }
+  .tab { font-size: 12px; }
+  .article {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 18px;
+  }
+}
+@container app (min-width: 980px) {
+  .chapter-grid { grid-template-columns: repeat(5, 1fr); }
+  .jie-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .article { max-width: 800px; }
+}
+@container app (min-width: 1200px) {
+  .chapter-grid { grid-template-columns: repeat(6, 1fr); }
 }
 
 /* 内容页搜索关键词标黄 */
